@@ -1,4 +1,6 @@
-# 计算平台和开发环境配置
+# 计算平台和环境配置
+
+[TOC]
 
 ## 1. 硬件配置
 
@@ -28,11 +30,11 @@
 
 ## 5. 虚拟环境配置步骤
 
-### 安装 [Anaconda](https://www.anaconda.com/download/success)
+### 5.1 安装 [Anaconda](https://www.anaconda.com/download/success)
 
 下载慢可以去[镜像](https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/)下载，安装完之后打开 Anaconda Prompt 。
 
-### PyTorch 环境
+### 5.2 PyTorch 环境
 
 1. 创建 conda 虚拟环境并激活:
 
@@ -64,7 +66,7 @@
    print("CUDA Version:", torch.version.cuda, "cuDNN Version:", torch.backends.cudnn.version())
    ```
 
-### PaddleX 环境
+### 5.3 PaddleX 环境
 
 1. 创建 conda 虚拟环境并激活:
 
@@ -122,7 +124,7 @@
 >
 > 验证时会弹出一大堆警告，忽略即可，再次编译会消失。
 
-### Jupyter Notebook
+### 5.4 Jupyter Notebook
 
 打开 Anaconda Navigator ，分别切换刚刚安装好的环境，再 Install 下载 Jupyter Notebook 。
 
@@ -133,13 +135,21 @@
 
 ## 6. 标注平台
 
-- **标注工具**:  Labelme
+### 6.1 LabelMe
+
+- **主要用途**:
+
+  - 对象检测
+  - 语义分割
+  - 实例分割
+  - 图像分类
 
 - **安装方法**:
 
   ```bash
   pip install labelme -i https://pypi.tuna.tsinghua.edu.cn/simple
   ```
+  
 - **使用方法**:
   ```bash
   labelme
@@ -149,7 +159,7 @@
   !labelme
   ```
 
-- **Labelme 标注工具输出的 JSON 文件格式如下**:
+- **LabelMe 标注工具输出的 JSON 文件格式如下**:
 
   ```json
   {
@@ -158,7 +168,7 @@
     "shapes": [
       {
         "label": "标签名称",
-        "points": [[x1, y1], [x2, y2], ...],
+        "points": [["x1", "y1"], ["x2", "y2"]],
         "group_id": null,
         "shape_type": "形状类型",
         "flags": {}
@@ -166,14 +176,72 @@
     ],
     "imagePath": "图像文件名",
     "imageData": "图像数据（base64 编码）",
-    "imageHeight": 图像高度,
-    "imageWidth": 图像宽度
+    "imageHeight": "图像高度",
+    "imageWidth": "图像宽度"
   }
+  ```
+
+### 6.2 PPOCRLabel
+
+- **主要用途**:
+
+  - 文本检测标注
+  - 文本识别标注
+  - 语义理解和关键信息提取（KIE模式）
+  - 半自动化标注工具
+
+- **安装方法**:
+
+  ```bash
+  pip install PPOCRLabel -i https://pypi.tuna.tsinghua.edu.cn/simple
+  ```
+
+- **使用方法**:
+
+  ```bash
+  # 启动【普通模式】，用于打【检测+识别】场景的标签
+  PPOCRLabel --lang ch
+  # 启动 【KIE 模式】，用于打【检测+识别+关键字提取】场景的标签
+  PPOCRLabel --lang ch --kie True
+  ```
+
+  或者在 jupyter notebook / python 环境中输入
+
+  ```python
+  !PPOCRLabel --lang ch
+  或
+  !PPOCRLabel --lang ch --kie True
+  ```
+
+> **使用报错**：
+>
+> OMP: Error #15: Initializing libiomp5md.dll, but found libiomp5md.dll already initialized.
+> OMP: Hint This means that multiple copies of the OpenMP runtime have been linked into the program. That is dangerous, since it can degrade performance or cause incorrect results. The best thing to do is to ensure that only a single OpenMP runtime is linked into the process, e.g. by avoiding static linking of the OpenMP runtime in any library. As an unsafe, unsupported, undocumented workaround you can set the environment variable KMP_DUPLICATE_LIB_OK=TRUE to allow the program to continue to execute, but that may cause crashes or silently produce incorrect results. For more information, please see http://www.intel.com/software/products/support/.
+>
+> **解决方法**：
+>
+> 删除 Anaconda3\envs\paddlex\Library\bin中的 libiomp5md.dll
+
+
+- **PPOCRLabel 标注工具输出的文件格式如下**:
+
+  - Label.txt
+  
+  ```tex
+  【普通模式】
+  imagePath	[{"transcription": "识别结果", "points": [[x1, y1], [x2, y2], ...], "difficult": false}]
+  【KIE 模式】
+  imagePath	[{"transcription": "识别结果", "points": [[x1, y1], [x2, y2], ...], "difficult": false, "key_cls": "自定义标签"}]
+  ```
+  - rec_gt.txt
+
+  ```tex
+  crop_img/图像文件名_crop_0.jpg	识别结果
   ```
 
 ## 7. 推理部署环境配置
 
-### 软件环境
+### 7.1 软件环境
 
 1. 下载安装 [CUDA 12.1.0](https://developer.nvidia.com/cuda-toolkit-archive)（安装在 C 盘，勾选 Visual Studio Integration）
 
@@ -195,14 +263,14 @@
 
 > 另附：[安装包](https://pan.baidu.com/s/1fCaesikH2DqwzrJ6bvxqeQ?pwd=dba5)百度网盘链接
 
-### Pytorch 部署环境
+### 7.2 Pytorch 部署环境
 
 1. 配置 ONNX RunTime 环境，具体参考 OpenCV 环境，里面包含了 ONNX RunTime 路径截图
-2. 运行时把 ...\onnxruntime-win-x64-gpu-1.17.3\lib 中四个 dll 复制到 exe 所在目录下
+2. 运行时把 ...\onnxruntime-win-x64-gpu-1.17.3\lib 中四个 dll 复制到编译的 exe 所在目录下
 
-### PaddleX 部署环境
+### 7.3 PaddleX 部署环境
 
-#### 1. FastDeploy C++ SDK 编译安装
+#### 7.3.1 FastDeploy C++ SDK 编译安装
 
 - [预编译库安装](https://github.com/PaddlePaddle/FastDeploy/blob/develop/docs/cn/build_and_install/download_prebuilt_libraries.md)
 
@@ -296,6 +364,6 @@ msbuild INSTALL.vcxproj /m /p:Configuration=Release /p:Platform=x64
 
 编译完成后，即在 `CMAKE_INSTALL_PREFIX` 指定的目录下生成 C++ 推理库
 
-#### 2. [FastDeploy C++ 库在 Windows 上的多种使用方式](https://github.com/PaddlePaddle/FastDeploy/blob/develop/docs/cn/faq/use_sdk_on_windows_build.md)
+#### 7.3.2 [FastDeploy C++ 库在 Windows 上的多种使用方式](https://github.com/PaddlePaddle/FastDeploy/blob/develop/docs/cn/faq/use_sdk_on_windows_build.html)
 
 推荐 Visual Studio 2019 创建 CMake 工程使用 C++ SDK ，进不去请[点击](use_sdk_on_windows_build.html)
